@@ -112,20 +112,28 @@ public class FireAndDamageSystem : MonoBehaviour
     }
 
     private void GrowFireEffect()
-    {
-        // Grow fire
-        float newFireSize = Mathf.Min(fireMain.startSize.constant + fireGrowthRate * Time.deltaTime, maxFireSize);
-        fireMain.startSize = newFireSize;
-        fireEmission.rateOverTime += fireGrowthRate * 5f * Time.deltaTime;
-        fireMain.startSpeed += fireGrowthRate * 0.5f * Time.deltaTime;
+{
+    // Grow fire size
+    float newFireSize = Mathf.Min(fireMain.startSize.constant + fireGrowthRate * Time.deltaTime, maxFireSize);
+    fireMain.startSize = newFireSize;
 
-        // Grow smoke proportionally
-        if (smokeParticle != null)
-        {
-            smokeMain.startSize = newFireSize * 0.8f;
-            smokeEmission.rateOverTime = fireEmission.rateOverTime.constant * 0.7f;
-        }
+    // Increase emission rate (requires handling MinMaxCurve)
+    ParticleSystem.MinMaxCurve emissionRate = fireEmission.rateOverTime;
+    emissionRate.constant += fireGrowthRate * 5f * Time.deltaTime;
+    fireEmission.rateOverTime = emissionRate;
+
+    // Increase speed
+    fireMain.startSpeed = fireMain.startSpeed.constant + fireGrowthRate * 0.5f * Time.deltaTime;
+
+    // Grow smoke proportionally (same fix for smoke)
+    if (smokeParticle != null)
+    {
+        smokeMain.startSize = newFireSize * 0.8f;
+        ParticleSystem.MinMaxCurve smokeEmissionRate = smokeEmission.rateOverTime;
+        smokeEmissionRate.constant = fireEmission.rateOverTime.constant * 0.7f;
+        smokeEmission.rateOverTime = smokeEmissionRate;
     }
+}
 
     private void ApplyDamageToPlayer()
     {

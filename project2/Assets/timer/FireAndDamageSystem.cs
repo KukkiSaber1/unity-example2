@@ -128,9 +128,9 @@ public class FireAndDamageSystem : MonoBehaviour
     // Grow smoke proportionally (same fix for smoke)
     if (smokeParticle != null)
     {
-        smokeMain.startSize = newFireSize * 0.8f;
+        smokeMain.startSize = newFireSize * 2f;
         ParticleSystem.MinMaxCurve smokeEmissionRate = smokeEmission.rateOverTime;
-        smokeEmissionRate.constant = fireEmission.rateOverTime.constant * 0.7f;
+        smokeEmissionRate.constant = fireEmission.rateOverTime.constant * 2f;
         smokeEmission.rateOverTime = smokeEmissionRate;
     }
 }

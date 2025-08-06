@@ -4,8 +4,14 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Pickup
   - fire
+  - FxTemporaire
+  - canPickUp
+  - Pickup
+  - UI
+  - Extinguisher
+  - Fire
+  - Equipable
   layers:
   - Default
   - TransparentFX
@@ -13,12 +19,12 @@ TagManager:
   - Pickup
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - IgnorePlayer
+  - holdLayer
+  - PlayerUI
+  - PickupLayer
+  - Player
+  - playerLayer
   - 
   - 
   - 

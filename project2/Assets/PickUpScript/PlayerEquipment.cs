@@ -7,21 +7,18 @@ public class PlayerEquipment : MonoBehaviour
     public Camera playerCamera;
     public float pickupDistance = 3f;
     public LayerMask pickupLayer;
+    
     public enum EquipmentType { Weapon, Tool, Gadget }
-public EquipmentType currentEquipmentType;
-
-// Then modify your EquipItem method to check type
+    public EquipmentType currentEquipmentType;
+    
     private GameObject equippedItem;
-    private Transform itemSocket; // Where items will be held
-    
-    
+    private Transform itemSocket;
     
     void Start()
     {
-        // Create a socket as a child of the camera
         itemSocket = new GameObject("ItemSocket").transform;
         itemSocket.parent = playerCamera.transform;
-        itemSocket.localPosition = new Vector3(0.9f, -0.4f, 1.5f); // Adjust as needed (+left/-right, +up/-down, +forward/-backward)
+        itemSocket.localPosition = new Vector3(0.9f, -0.4f, 1.5f);
         itemSocket.localRotation = Quaternion.identity;
     }
     
@@ -63,7 +60,10 @@ public EquipmentType currentEquipmentType;
     {
         equippedItem = item;
         
-        // Disable physics while equipped
+        // Change tag to "PickedUp"
+        equippedItem.tag = "PickedUp";
+        
+        // Disable physics
         Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -71,7 +71,7 @@ public EquipmentType currentEquipmentType;
             rb.interpolation = RigidbodyInterpolation.None;
         }
         
-        // Parent to socket and reset transform
+        // Parent to socket
         equippedItem.transform.SetParent(itemSocket);
         equippedItem.transform.localPosition = Vector3.zero;
         equippedItem.transform.localRotation = Quaternion.identity;
@@ -80,6 +80,9 @@ public EquipmentType currentEquipmentType;
     void DropItem()
     {
         if (equippedItem == null) return;
+        
+        // Revert tag back to "canPickUp"
+        equippedItem.tag = "canPickUp";
         
         // Re-enable physics
         Rigidbody rb = equippedItem.GetComponent<Rigidbody>();

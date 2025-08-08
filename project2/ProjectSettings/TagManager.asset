@@ -12,6 +12,7 @@ TagManager:
   - Extinguisher
   - Fire
   - Equipable
+  - PickedUp
   layers:
   - Default
   - TransparentFX
@@ -22,9 +23,9 @@ TagManager:
   - IgnorePlayer
   - holdLayer
   - PlayerUI
-  - PickupLayer
   - Player
-  - playerLayer
+  - 
+  - 
   - 
   - 
   - 

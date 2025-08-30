@@ -5,20 +5,30 @@ using UnityEngine;
 public class PlayerEquipment : MonoBehaviour
 {
     public Camera playerCamera;
-    public float pickupDistance = 3f;
+    public float pickupDistance = 2f;
     public LayerMask pickupLayer;
     
     public enum EquipmentType { Weapon, Tool, Gadget }
     public EquipmentType currentEquipmentType;
     
+    [Header("Layer Settings")]
+    [Tooltip("Name of the layer to switch to when item is picked up (e.g., 'Ignore Raycast').")]
+    public string pickedUpLayerName = "Ignore Raycast";
+    private int pickedUpLayer;
+    private int defaultLayer;
+
     private GameObject equippedItem;
     private Transform itemSocket;
     
     void Start()
     {
+        // Initialize the layer index
+        pickedUpLayer = LayerMask.NameToLayer(pickedUpLayerName);
+        
+        // Create item socket
         itemSocket = new GameObject("ItemSocket").transform;
         itemSocket.parent = playerCamera.transform;
-        itemSocket.localPosition = new Vector3(0.9f, -0.4f, 1.5f);
+        itemSocket.localPosition = new Vector3(0.9f, -0.4f, 1f);
         itemSocket.localRotation = Quaternion.identity;
     }
     
@@ -60,8 +70,12 @@ public class PlayerEquipment : MonoBehaviour
     {
         equippedItem = item;
         
-        // Change tag to "PickedUp"
+        // Save the object's original layer
+        defaultLayer = equippedItem.layer;
+        
+        // Change tag and layer
         equippedItem.tag = "PickedUp";
+        equippedItem.layer = pickedUpLayer;
         
         // Disable physics
         Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
@@ -81,8 +95,9 @@ public class PlayerEquipment : MonoBehaviour
     {
         if (equippedItem == null) return;
         
-        // Revert tag back to "canPickUp"
+        // Revert tag and layer
         equippedItem.tag = "canPickUp";
+        equippedItem.layer = defaultLayer;
         
         // Re-enable physics
         Rigidbody rb = equippedItem.GetComponent<Rigidbody>();

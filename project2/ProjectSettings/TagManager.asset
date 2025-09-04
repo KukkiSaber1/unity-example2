@@ -13,18 +13,19 @@ TagManager:
   - Fire
   - Equipable
   - PickedUp
+  - playerShoot
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Pickup
+  - 
   - Water
   - UI
+  - 
+  - IgnoreRaycast
   - IgnorePlayer
   - holdLayer
-  - PlayerUI
   - Player
-  - 
   - 
   - 
   - 

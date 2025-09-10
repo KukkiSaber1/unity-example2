@@ -22,18 +22,15 @@ public class FireAndDamageSystem : MonoBehaviour
     public LayerMask playerLayer;
     public float damageRadius = 2f;
 
-    [Header("Fire Spread Settings")]
-    public float spreadInterval = 5f;
-    public float spreadRadius = 3f;
-    public GameObject[] flammableObjects; // Assign in Inspector
+    
 
     private bool timerIsRunning = true;
     private bool hasTriggeredFire = false;
     private float fireActiveTime = 0f;
-    private float nextSpreadTime = 0f;
+    
     private ParticleSystem.MainModule fireMain, smokeMain;
     private ParticleSystem.EmissionModule fireEmission, smokeEmission;
-    private List<GameObject> activeFires = new List<GameObject>();
+    
 
     private void Start()
     {
@@ -73,7 +70,7 @@ public class FireAndDamageSystem : MonoBehaviour
                     fireActiveTime += Time.deltaTime;
                     GrowFireEffect();
                     ApplyDamageToPlayer();
-                    TrySpreadFire();
+                    
                 }
             }
             else
@@ -101,7 +98,7 @@ public class FireAndDamageSystem : MonoBehaviour
             fireEmission.rateOverTime = 10f;
             fireMain.startSpeed = 1f;
             fireParticle.Play();
-            activeFires.Add(fireParticle.gameObject);
+            
         }
         if (smokeParticle != null)
         {
@@ -148,19 +145,5 @@ public class FireAndDamageSystem : MonoBehaviour
         }
     }
 
-    private void TrySpreadFire()
-    {
-        if (Time.time >= nextSpreadTime && flammableObjects.Length > 0)
-        {
-            nextSpreadTime = Time.time + spreadInterval;
-            GameObject randomObject = flammableObjects[Random.Range(0, flammableObjects.Length)];
-            
-            if (!activeFires.Contains(randomObject))
-            {
-                ParticleSystem newFire = Instantiate(fireParticle, randomObject.transform.position, Quaternion.identity);
-                newFire.Play();
-                activeFires.Add(newFire.gameObject);
-            }
-        }
-    }
+    
 }

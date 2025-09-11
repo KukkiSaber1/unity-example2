@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerEquipment1 : MonoBehaviour
+public class PlayerEquipment : MonoBehaviour
 {
     public Camera playerCamera;
     public float pickupDistance = 2f;

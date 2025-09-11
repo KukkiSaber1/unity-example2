@@ -13,12 +13,12 @@ TagManager:
   - Fire
   - Equipable
   - PickedUp
-  - playerShoot
+  - HoldingItem
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - fire
   - Water
   - UI
   - Item

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerEquipment : MonoBehaviour
+public class PlayerEquipment1 : MonoBehaviour
 {
     public Camera playerCamera;
     public float pickupDistance = 2f;
@@ -26,9 +26,10 @@ public class PlayerEquipment : MonoBehaviour
     public ParticleSystem useParticle;   // Assign via Inspector
 
     [Header("Socket Settings")]
-    public Vector3 objectSocketPosition = new Vector3(0.9f, -0.4f, 1f); // Original object position
-    public Vector3 particleSocketPosition = new Vector3(0f, 0f, 1f); // Center for particles
-    public Vector3 particleOffset = new Vector3(0f, 0f, 0f); // Adjust particle position
+    public Vector3 objectSocketPosition = new Vector3(0.9f, -0.4f, 1f); // Original object position = 0.4f, -1.9f, 0.4f
+    public Vector3 objectSocketRotation = new Vector3(30f, 180f, 0f); // Original object rotation = -20f, -140f, 0f
+    public Vector3 particleSocketPosition = new Vector3(0f, 0f, 1f); // Center for particles 0.4f, -0.1f, 1.2f
+    public Vector3 particleOffset = new Vector3(0f, 0f, 0f); // Adjust particle position = 0.2f, -0.2f, 0f
 
     void Start()
     {
@@ -40,6 +41,8 @@ public class PlayerEquipment : MonoBehaviour
         itemSocket.parent = playerCamera.transform;
         itemSocket.localPosition = objectSocketPosition;// new Vector3(0.9f, -0.4f, 1f);
         itemSocket.localRotation = Quaternion.identity;
+        // Set the socket’s starting rotation in the inspector
+        itemSocket.localRotation = Quaternion.Euler(objectSocketRotation);
 
         // Create separate socket for particles (center position)
         particleSocket = new GameObject("ParticleSocket").transform;
@@ -148,6 +151,9 @@ public class PlayerEquipment : MonoBehaviour
         equippedItem.transform.SetParent(itemSocket);
         equippedItem.transform.localPosition = Vector3.zero;
         equippedItem.transform.localRotation = Quaternion.identity;
+        
+        // **Apply your rotation offset here**
+        equippedItem.transform.localRotation = Quaternion.Euler(objectSocketRotation);
 
         // Play equip particle effect if assigned
         if (equipParticle != null)

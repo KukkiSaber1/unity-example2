@@ -18,7 +18,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - fire
+  - Fire
   - Water
   - UI
   - Item
@@ -27,7 +27,7 @@ TagManager:
   - holdLayer
   - Player
   - Tool
-  - 
+  - Projectile
   - 
   - 
   - 

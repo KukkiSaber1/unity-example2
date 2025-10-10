@@ -20,8 +20,8 @@ public class PlayerEquipment2 : MonoBehaviour
         // Create a socket under the camera for all items
         itemSocket = new GameObject("ItemSocket").transform;
         itemSocket.SetParent(playerCamera.transform, false);
-        itemSocket.localPosition = new Vector3(0.9f, -0.4f, 1f);
-        itemSocket.localRotation = Quaternion.Euler(30f, 180f, 0f);
+        itemSocket.localPosition = new Vector3(0.2f, -2f, 0.6f);//default (0.9f, -0.4f, 1f);
+        itemSocket.localRotation = Quaternion.Euler(0f, 90f, 0f);//default (30f, 180f, 0f);
     }
 
     void Update()

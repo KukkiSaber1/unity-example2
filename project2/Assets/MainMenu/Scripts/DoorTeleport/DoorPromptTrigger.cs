@@ -22,7 +22,7 @@ public class DoorPromptTrigger : MonoBehaviour
 
         playerInside = true;
         playerObj = other.gameObject;
-        promptText.text = "Press E to Enter";
+        promptText.text = "Press E";
         promptText.gameObject.SetActive(true);
     }
 

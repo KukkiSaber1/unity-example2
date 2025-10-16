@@ -9,7 +9,7 @@ public class ScreenFader : MonoBehaviour
     [SerializeField] private float fadeDuration = 0.5f;
 
     private void Awake()
-    {
+{
     if (Instance == null) Instance = this;
     else Destroy(gameObject);
 
@@ -19,6 +19,7 @@ public class ScreenFader : MonoBehaviour
         fadeImage.color = new Color(0, 0, 0, 0);
     }
 }
+
 
     public void FadeOut(System.Action onComplete = null)
     {

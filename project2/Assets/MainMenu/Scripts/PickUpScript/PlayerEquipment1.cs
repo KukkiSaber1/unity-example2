@@ -57,6 +57,24 @@ public class PlayerEquipment1 : MonoBehaviour
     // internal state for UI toggle behavior
     private bool isUsing = false;
 
+    [Header("Snap Settings")]
+    [Tooltip("Layer mask for snap zones")]
+    public LayerMask snapZoneLayer;
+    [Tooltip("Max distance to show snap preview / snap")]
+    public float snapRange = 3f;
+    [Tooltip("Optional screen-space UI Text to show 'Press E to Snap'")]
+    public Text interactText;
+    [Tooltip("Optional material used for ghost preview when SnapZone creates a ghost from the held item")]
+    public Material ghostMaterial;
+
+    [Header("Auto Snap On Drop")]
+public bool autoSnapOnDrop = true;
+public float autoSnapRadius = 1f; // radius to search for snap zones when dropping
+
+
+    private SnapZone lookedSnapZone;
+    private string cameraDefaultTag;
+
     void Start()
     {
         pickedUpLayer = LayerMask.NameToLayer(pickedUpLayerName);
@@ -85,6 +103,9 @@ public class PlayerEquipment1 : MonoBehaviour
             useParticle.transform.localRotation = Quaternion.identity;
             useParticle.Stop();
         }
+
+        if (playerCamera != null)
+            cameraDefaultTag = playerCamera.tag;
     }
 
     void OnEnable()
@@ -115,6 +136,7 @@ public class PlayerEquipment1 : MonoBehaviour
     {
         HandlePickup();
         HandleUseItem();
+        UpdateSnapPreview();
         HandleInteractInput();
     }
 
@@ -201,14 +223,25 @@ public class PlayerEquipment1 : MonoBehaviour
     {
         if (Input.GetKeyDown(interactKey))
         {
-            // Optionally check state here (e.g., only when equippedItem != null)
+            // If holding an eligible item and looking at a snap zone, snap it
+            if (equippedItem != null && lookedSnapZone != null)
+            {
+                SnapHeldItemToZone(lookedSnapZone);
+                return;
+            }
+
             OnInteract?.Invoke();
         }
     }
 
     public void OnInteractUIButtonPressed()
     {
-        // Optionally check state here (e.g., only when equippedItem != null)
+        if (equippedItem != null && lookedSnapZone != null)
+        {
+            SnapHeldItemToZone(lookedSnapZone);
+            return;
+        }
+
         OnInteract?.Invoke();
     }
 
@@ -255,26 +288,125 @@ public class PlayerEquipment1 : MonoBehaviour
     }
 
     void DropItem()
-    {
-        if (equippedItem == null) return;
+{
+    if (equippedItem == null) return;
 
-        if (useParticle != null && useParticle.isPlaying)
+    // Try auto-snap before releasing to world
+    if (autoSnapOnDrop)
+    {
+        Collider[] hits = Physics.OverlapSphere(equippedItem.transform.position, autoSnapRadius, snapZoneLayer);
+        foreach (var c in hits)
         {
-            useParticle.Stop();
+            SnapZone zone = c.GetComponentInParent<SnapZone>();
+            if (zone == null) continue;
+            Snappable sn = equippedItem.GetComponent<Snappable>();
+            if (sn == null || !sn.IsAllowedForZone(zone) || zone.isOccupied) continue;
+            if (zone.requireReleaseInside && !zone.IsObjectInside(equippedItem)) continue;
+
+            // Snap and return (SnapHeldItemToZone uses equippedItem)
+            SnapHeldItemToZone(zone);
+            return;
+        }
+    }
+
+    // No auto-snap found — perform normal drop
+    if (useParticle != null && useParticle.isPlaying) useParticle.Stop();
+
+    equippedItem.tag = "canPickUp";
+    equippedItem.layer = defaultLayer;
+
+    Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        rb.isKinematic = false;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+    }
+
+    equippedItem.transform.SetParent(null);
+    equippedItem = null;
+    isUsing = false;
+
+    if (lookedSnapZone != null)
+    {
+        lookedSnapZone.HidePreview();
+        lookedSnapZone = null;
+    }
+
+    if (interactText != null) interactText.enabled = false;
+}
+
+
+    // Show/hide preview and prompt while looking at a SnapZone
+    void UpdateSnapPreview()
+    {
+        if (playerCamera == null) return;
+
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, snapRange, snapZoneLayer))
+        {
+            SnapZone zone = hit.collider.GetComponentInParent<SnapZone>();
+            if (zone != null && equippedItem != null)
+            {
+                Snappable sn = equippedItem.GetComponent<Snappable>();
+                if (sn != null && sn.IsAllowedForZone(zone) && !zone.isOccupied)
+                {
+                    // pass ghost material if you want the zone to use it
+                    if (ghostMaterial != null)
+                        zone.ghostMaterial = ghostMaterial;
+
+                    zone.ShowPreview(equippedItem);
+                    lookedSnapZone = zone;
+
+                    if (interactText != null)
+                    {
+                        interactText.text = "Press E to Snap";
+                        interactText.enabled = true;
+                    }
+
+                    return;
+                }
+            }
         }
 
-        equippedItem.tag = "canPickUp";
+        // nothing valid under the crosshair
+        if (lookedSnapZone != null)
+        {
+            lookedSnapZone.HidePreview();
+            lookedSnapZone = null;
+        }
+
+        if (interactText != null)
+            interactText.enabled = false;
+    }
+
+    void SnapHeldItemToZone(SnapZone zone)
+    {
+        if (equippedItem == null || zone == null) return;
+
+        Snappable sn = equippedItem.GetComponent<Snappable>();
+        if (sn == null || !sn.IsAllowedForZone(zone)) return;
+
+        // restore layer/tag before snapping
+        equippedItem.tag = "Snapped";
         equippedItem.layer = defaultLayer;
 
-        Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
-        }
+        zone.SnapObject(equippedItem);
 
-        equippedItem.transform.SetParent(null);
+        // clear equipped state
         equippedItem = null;
         isUsing = false;
+
+        if (playerCamera != null)
+            playerCamera.tag = cameraDefaultTag;
+
+        if (equipParticle != null)
+            equipParticle.Stop();
+
+        if (interactText != null)
+            interactText.enabled = false;
+
+        lookedSnapZone = null;
     }
 }

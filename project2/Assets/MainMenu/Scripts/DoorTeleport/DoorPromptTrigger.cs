@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class DoorPromptTrigger : MonoBehaviour
 {
     [SerializeField] private string teleportId;
     [SerializeField] private string playerTag = "Player";
-    [SerializeField] private Text promptText; 
+    [SerializeField] private TextMeshProUGUI promptText; 
 
     private bool playerInside = false;
     private GameObject playerObj;

@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MainMenu/Scenes/main5.unity
     guid: 2e3b271ac735ac643a6cb0fe9ceb963a
+  - enabled: 1
+    path: Assets/JMO Assets/Cartoon FX Remaster/CFXRF Demo.unity
+    guid: 04a677eab942f3842bc623749775964d
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 3ef59b7f3931a6d4ca4c0a6b2c545ba2, type: 2}

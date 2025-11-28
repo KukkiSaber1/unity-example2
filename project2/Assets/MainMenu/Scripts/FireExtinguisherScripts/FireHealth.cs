@@ -15,13 +15,19 @@ public class FireHealth : MonoBehaviour
     public ParticleSystem fireParticle;
 
     [Header("Events")]
-    public UnityEvent<float> onHealthChanged;    // passes new health
+    // This event is invoked only when health decreases and cooldown has elapsed.
+    public UnityEvent<float> onHealthChanged;    // passes new health when decreased (subject to cooldown)
     public UnityEvent onFireExtinguished;        // health == 0
     public UnityEvent onFireMaxed;               // health == max
     public UnityEvent onFireHalfHealth;          // health crosses half
 
+    [Header("Cooldown")]
+    [Tooltip("Minimum seconds between consecutive onHealthChanged invocations when health decreases.")]
+    public float healthChangeCooldown = 3f;
+
     private ParticleSystem.MainModule mainModule;
     private bool wasAboveHalf = true;            // track last state
+    private float lastHealthDecreaseEventTime = -Mathf.Infinity;
 
     void Awake()
     {
@@ -36,7 +42,6 @@ public class FireHealth : MonoBehaviour
         // Clamp and immediately apply visual scale
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         ApplyScale();
-        onHealthChanged?.Invoke(currentHealth);
 
         // Initialize half-health state
         wasAboveHalf = currentHealth >= maxHealth * 0.5f;
@@ -52,18 +57,27 @@ public class FireHealth : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth + amount, 0f, maxHealth);
 
         // Only react if value actually changed
-        if (!Mathf.Approximately(previous, currentHealth))
+        if (Mathf.Approximately(previous, currentHealth))
+            return;
+
+        // Invoke onHealthChanged only when health decreased and cooldown elapsed
+        if (currentHealth < previous)
         {
-            onHealthChanged?.Invoke(currentHealth);
-            ApplyScale();
-
-            if (currentHealth <= 0f)
-                onFireExtinguished?.Invoke();
-            else if (currentHealth >= maxHealth)
-                onFireMaxed?.Invoke();
-
-            CheckHalfHealth(previous, currentHealth);
+            if (Time.time - lastHealthDecreaseEventTime >= healthChangeCooldown)
+            {
+                onHealthChanged?.Invoke(currentHealth);
+                lastHealthDecreaseEventTime = Time.time;
+            }
         }
+
+        ApplyScale();
+
+        if (currentHealth <= 0f)
+            onFireExtinguished?.Invoke();
+        else if (currentHealth >= maxHealth)
+            onFireMaxed?.Invoke();
+
+        CheckHalfHealth(previous, currentHealth);
     }
 
     /// <summary>
@@ -71,7 +85,7 @@ public class FireHealth : MonoBehaviour
     /// </summary>
     private void ApplyScale()
     {
-        float ratio = currentHealth / maxHealth;
+        float ratio = (maxHealth > 0f) ? currentHealth / maxHealth : 0f;
         float size = Mathf.Lerp(minSize, maxSize, ratio);
         mainModule.startSize = size;
     }
@@ -90,5 +104,13 @@ public class FireHealth : MonoBehaviour
             onFireHalfHealth?.Invoke();
             wasAboveHalf = isNowAboveHalf;
         }
+    }
+
+    void OnValidate()
+    {
+        // Keep sensible ranges in the editor
+        maxHealth = Mathf.Max(0.0001f, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        healthChangeCooldown = Mathf.Max(0f, healthChangeCooldown);
     }
 }

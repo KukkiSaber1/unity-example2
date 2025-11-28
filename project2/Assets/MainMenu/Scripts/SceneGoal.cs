@@ -1,11 +1,14 @@
 using UnityEngine;
 
 public class SceneGoal : MonoBehaviour {
+    public int levelIndex = 1; // current level index (1-based)
+
     public void MissionComplete() {
-        // Unlock Scene 2 (index 2 in LevelManager)
-        PlayerPrefs.SetInt("UnlockedLevel", 2);
+        int nextUnlocked = levelIndex + 1;
+        PlayerPrefs.SetInt("UnlockedLevel", nextUnlocked);
+        PlayerPrefs.SetInt("LastCompletedLevel", levelIndex);
         PlayerPrefs.Save();
 
-        Debug.Log("Scene 1 completed! Scene 2 unlocked.");
+        Debug.Log($"Level {levelIndex} completed! Level {nextUnlocked} unlocked.");
     }
 }

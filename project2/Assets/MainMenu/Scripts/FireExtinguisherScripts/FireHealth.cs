@@ -17,9 +17,11 @@ public class FireHealth : MonoBehaviour
     [Header("Events")]
     public UnityEvent<float> onHealthChanged;    // passes new health
     public UnityEvent onFireExtinguished;        // health == 0
-    public UnityEvent onFireMaxed;              // health == max
+    public UnityEvent onFireMaxed;               // health == max
+    public UnityEvent onFireHalfHealth;          // health crosses half
 
     private ParticleSystem.MainModule mainModule;
+    private bool wasAboveHalf = true;            // track last state
 
     void Awake()
     {
@@ -35,6 +37,9 @@ public class FireHealth : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         ApplyScale();
         onHealthChanged?.Invoke(currentHealth);
+
+        // Initialize half-health state
+        wasAboveHalf = currentHealth >= maxHealth * 0.5f;
     }
 
     /// <summary>
@@ -56,6 +61,8 @@ public class FireHealth : MonoBehaviour
                 onFireExtinguished?.Invoke();
             else if (currentHealth >= maxHealth)
                 onFireMaxed?.Invoke();
+
+            CheckHalfHealth(previous, currentHealth);
         }
     }
 
@@ -67,5 +74,21 @@ public class FireHealth : MonoBehaviour
         float ratio = currentHealth / maxHealth;
         float size = Mathf.Lerp(minSize, maxSize, ratio);
         mainModule.startSize = size;
+    }
+
+    /// <summary>
+    /// Fires event whenever health crosses the half threshold.
+    /// </summary>
+    private void CheckHalfHealth(float previous, float current)
+    {
+        float half = maxHealth * 0.5f;
+        bool isNowAboveHalf = current >= half;
+
+        // Detect crossing the threshold
+        if (isNowAboveHalf != wasAboveHalf)
+        {
+            onFireHalfHealth?.Invoke();
+            wasAboveHalf = isNowAboveHalf;
+        }
     }
 }

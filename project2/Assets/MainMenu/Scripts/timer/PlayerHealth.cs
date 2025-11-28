@@ -11,10 +11,10 @@ public class PlayerHealth : MonoBehaviour
     public float currentHealth;
     public bool isDead = false;
 
-    [Header("UI (Optional)")]
+    [Header("UI")]
     public Slider healthSlider;
 
-    [Header("Respawn (Optional)")]
+    [Header("Respawn")]
     public Transform respawnPoint;
     public float respawnDelay = 3f;
 
@@ -26,10 +26,11 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Invoked whenever health decreases (fires repeatedly for a duration).")]
     public UnityEvent<float> onHealthDecreased;
 
+    [Tooltip("Invoked once when the player dies.")]
+    public UnityEvent onDeath;
+
     [Header("Event Settings")]
-    [Tooltip("How long the event keeps firing after damage.")]
     public float eventDuration = 3f;
-    [Tooltip("How often to invoke the event during that duration.")]
     public float eventInterval = 0.5f;
 
     private Coroutine damageEventRoutine;
@@ -53,7 +54,6 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHealth < previousHealth)
         {
-            // Start or restart the repeating event coroutine
             if (damageEventRoutine != null)
                 StopCoroutine(damageEventRoutine);
 
@@ -88,8 +88,20 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        if (isDead) return;
+
         isDead = true;
         Debug.Log("Player died!");
+
+        // Stop the repeating damage event if running
+        if (damageEventRoutine != null)
+        {
+            StopCoroutine(damageEventRoutine);
+            damageEventRoutine = null;
+        }
+
+        // Invoke death event
+        onDeath?.Invoke();
 
         GetComponent<FirstPersonMovement>().enabled = false;
         GetComponent<Jump>().enabled = false;

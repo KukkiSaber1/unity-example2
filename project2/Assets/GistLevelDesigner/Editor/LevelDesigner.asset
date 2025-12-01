@@ -18,3 +18,18 @@ MonoBehaviour:
     GUID: 3cef2f915d435564082fb0c1696d3765
     fileID: 5994139911943994682
     rootGUID: b6c20a7b777c8c8489da121259db8e02
+  - identity: 1
+    instanceID: -625464
+    GUID: ad2e357f5e771174c8b3861c0f014e54
+    fileID: 0
+    rootGUID: 942a33a3b8f1a4d428176bb974938bd9
+  - identity: 2
+    instanceID: 0
+    GUID: 942a33a3b8f1a4d428176bb974938bd9
+    fileID: 5189742575867724629
+    rootGUID: 1db00c92315ee2543a7f3e2562cf0392
+  - identity: 2
+    instanceID: 0
+    GUID: 1ec6ff480f946be458e1e549fe23a5eb
+    fileID: 2645056356777851682
+    rootGUID: 942a33a3b8f1a4d428176bb974938bd9

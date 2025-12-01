@@ -18250,6 +18250,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 800362843}
     m_Modifications:
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Size.x
+      value: 0.9753104
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Size.z
+      value: 0.1946502
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Center.x
+      value: -0.39555067
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Center.z
+      value: -0.0035863598
+      objectReference: {fileID: 0}
     - target: {fileID: 4614117659340421231, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_Name
       value: toon_office_door (2)
@@ -18280,7 +18300,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5423305078329565909, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.011
+      value: 4.85
       objectReference: {fileID: 0}
     - target: {fileID: 5423305078329565909, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_LocalRotation.w
@@ -18333,8 +18353,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.97531044, y: 1.4703327, z: 0.4007844}
-  m_Center: {x: -0.3955508, y: 0.7351664, z: 0}
+  m_Size: {x: 0.97531044, y: 1.4703327, z: 0.2904972}
+  m_Center: {x: -0.39555082, y: 0.7351664, z: -0.055143796}
 --- !u!1001 &474981533
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42040,6 +42060,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2060968142}
     m_Modifications:
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Size.x
+      value: 0.9753104
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Size.z
+      value: 0.17006674
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Center.x
+      value: -0.39555064
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751980367600589242, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
+      propertyPath: m_Center.z
+      value: -0.01587809
+      objectReference: {fileID: 0}
     - target: {fileID: 4614117659340421231, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_Name
       value: toon_office_door (3)
@@ -42062,7 +42098,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5423305078329565909, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 37.02
+      value: 36.86
       objectReference: {fileID: 0}
     - target: {fileID: 5423305078329565909, guid: 85bb36dacd5804745a0d8fc8e3b3b108, type: 3}
       propertyPath: m_LocalPosition.y
@@ -42123,8 +42159,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.97531044, y: 1.4703327, z: 0.4007844}
-  m_Center: {x: -0.3955508, y: 0.7351664, z: 0}
+  m_Size: {x: 0.97531044, y: 1.4703327, z: 0.30433193}
+  m_Center: {x: -0.3955508, y: 0.7351664, z: -0.04822627}
 --- !u!4 &1199469608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: b8ee657c6800ab849bb30b4375d02323, type: 3}

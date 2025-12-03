@@ -16795,7 +16795,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7e7f879bdd7a54c9481681b64c4e83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joystickComponent: {fileID: 0}
+  joystickComponent: {fileID: 1037856926}
   walkSpeed: 4
   runSpeed: 4
   canRun: 1
@@ -37882,6 +37882,7 @@ PlayableDirector:
     - 6e6ea78ee90b9c2499c9c3835ea84694: {fileID: 0}
     - 561aea455acaaed4585903f028625dd2: {fileID: 0}
     - 58d7181d6ddb6ed4aa042ad1ee8a6f7e: {fileID: 161129317}
+    - 89e37bb3d22456e46aa0ae9eee09bd0c: {fileID: 430055967}
     - 34f700f08c534fd4baa0b0477b1e3f93: {fileID: 1384672570}
     - 9ae2c3e7c6a802948b3778c50e59b1ec: {fileID: 1741005873}
     - 540c002dff909d2439c6e6e722b67b22: {fileID: 0}
@@ -47334,7 +47335,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 430055975}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
         m_MethodName: set_enabled
         m_Mode: 6

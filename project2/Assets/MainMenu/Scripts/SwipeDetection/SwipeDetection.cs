@@ -125,7 +125,7 @@ public class SwipeDetection : MonoBehaviour
         // Show success message
         if (feedbackText != null)
         {
-            feedbackText.text = "Nice Job!";
+            feedbackText.text = "<b>Nice Job!</b>";
             feedbackText.color = Color.green;
             feedbackText.gameObject.SetActive(true);
         }
@@ -141,7 +141,7 @@ public class SwipeDetection : MonoBehaviour
     {
         if (feedbackText != null)
         {
-            feedbackText.text = "Swipe Faster/Longer!";
+            feedbackText.text = "<b>Swipe Faster/Longer!</b>";
             feedbackText.color = Color.red;
             feedbackText.gameObject.SetActive(true);
         }

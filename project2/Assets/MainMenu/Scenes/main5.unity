@@ -22753,8 +22753,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: SUCCESS!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
+  m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -22784,7 +22784,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -25717,7 +25717,7 @@ RectTransform:
   m_GameObject: {fileID: 717590520}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.83172, y: 0.83172, z: 0.83172}
+  m_LocalScale: {x: 0.91739005, y: 0.91739005, z: 0.91739005}
   m_Children: []
   m_Father: {fileID: 1747724533}
   m_RootOrder: 0
@@ -25749,10 +25749,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 13
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 8
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -67360,13 +67360,14 @@ MonoBehaviour:
   timeWeight: 10
   healthWeight: 100
   scoreText: {fileID: 701727768}
+  achievementThreshold: 300
   onScoreCalculated:
     m_PersistentCalls:
       m_Calls: []
   onAchievementUnlocked:
     m_PersistentCalls:
       m_Calls: []
-  achievementThreshold: 300
+  scene: 0
 --- !u!4 &2108059406
 Transform:
   m_ObjectHideFlags: 0

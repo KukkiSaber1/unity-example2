@@ -23007,7 +23007,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: SUCCESS!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -23038,7 +23038,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -23071,7 +23071,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &616052127
@@ -40786,13 +40786,14 @@ MonoBehaviour:
   timeWeight: 10
   healthWeight: 100
   scoreText: {fileID: 1617186445}
+  achievementThreshold: 300
   onScoreCalculated:
     m_PersistentCalls:
       m_Calls: []
   onAchievementUnlocked:
     m_PersistentCalls:
       m_Calls: []
-  achievementThreshold: 300
+  scene: 1
 --- !u!4 &1180318849
 Transform:
   m_ObjectHideFlags: 0

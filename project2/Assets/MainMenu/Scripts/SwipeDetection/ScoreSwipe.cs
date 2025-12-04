@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScoreManager : MonoBehaviour
+public class ScoreSwipe : MonoBehaviour
 {
     [Header("Score Settings")]
     public int currentScore = 0;
@@ -10,7 +10,7 @@ public class ScoreManager : MonoBehaviour
     public AudioClip swipeSuccessSound;
     private AudioSource audioSource;
 
-    public static ScoreManager Instance { get; private set; }
+    public static ScoreSwipe Instance { get; private set; }
 
     void Awake()
     {

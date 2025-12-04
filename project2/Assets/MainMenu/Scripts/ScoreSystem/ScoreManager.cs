@@ -2,34 +2,30 @@ using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
 
-public class ScoreSystem : MonoBehaviour
+public class ScoreManager : MonoBehaviour
 {
-    [Header("References")]
-    public MaxTimer timer;           // Drag your MiniTimer here
-    public PlayerHealth playerHealth; // Drag your PlayerHealth here
+    public MaxTimer timer;               // Drag your MaxTimer here
+    public PlayerHealth playerHealth;    // Drag your PlayerHealth here
 
-    [Header("Scoring")]
-    [Tooltip("Multiplier for remaining seconds from the timer")]
+    [Header("Scoring weights")]
     public float timeWeight = 10f;
-    [Tooltip("Multiplier for health percentage (0..1)")]
     public float healthWeight = 100f;
 
     [Header("UI (optional)")]
     public TextMeshProUGUI scoreText;
 
-    [Header("Events")]
-    [Tooltip("Invoked when score is calculated (e.g., on finish)")]
+    [Header("Achievement")]
+    public int achievementThreshold = 300;
     public UnityEvent<int> onScoreCalculated;
-    [Tooltip("Invoked if score meets or exceeds achievementThreshold")]
     public UnityEvent onAchievementUnlocked;
 
-    [Header("Achievement")]
-    [Tooltip("Score required to unlock achievement")]
-    public int achievementThreshold = 300;
+    public enum SceneOption { Scene1, Scene2, Scene3, Scene4 } // edit names as needed
+    [Tooltip("Select which scene this score belongs to")]
+    public SceneOption scene = SceneOption.Scene1;
 
     private int lastScore;
 
-    // Call this whenever you want (e.g., timer finishes, level ends, button press)
+    // Call this to compute and save the score (hook to timer.onTimerFinished)
     public void CalculateAndPublishScore()
     {
         if (timer == null || playerHealth == null)
@@ -38,7 +34,7 @@ public class ScoreSystem : MonoBehaviour
             return;
         }
 
-        float remainingSeconds = timer.TimeRemaining;                // from MiniTimer
+        float remainingSeconds = timer.TimeRemaining; // MaxTimer must expose TimeRemaining
         float healthPercent = playerHealth.currentHealth / playerHealth.maxHealth;
 
         float rawScore = (remainingSeconds * timeWeight) + (healthPercent * healthWeight);
@@ -48,8 +44,11 @@ public class ScoreSystem : MonoBehaviour
 
         onScoreCalculated?.Invoke(lastScore);
         if (lastScore >= achievementThreshold) onAchievementUnlocked?.Invoke();
+
+        // Save to persistent scoreboard using the selected scene name
+        string sceneName = scene.ToString();
+        PersistentScores.AddScore(sceneName, lastScore);
     }
 
-    // Optional: expose last score for other scripts/UI
     public int GetLastScore() => lastScore;
 }

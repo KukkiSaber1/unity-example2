@@ -1,122 +1,160 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-#if TMP_PRESENT
 using TMPro;
-#endif
+using UnityEngine.UI;
 
 public class MaxTimer : MonoBehaviour
 {
     [Tooltip("Duration of the timer in seconds")]
     public float duration = 5f;
 
-    [Tooltip("Event to invoke when the timer finishes")]
+    [Header("Events")]
+    [Tooltip("Invoked when the timer finishes")]
     public UnityEvent onTimerFinished;
+    [Tooltip("Invoked when the timer is paused")]
+    public UnityEvent onTimerPaused;
+    [Tooltip("Invoked when the timer is resumed")]
+    public UnityEvent onTimerResumed;
 
-    [Header("UI (drag components here)")]
-    [Tooltip("Optional UnityEngine.UI.Text to show remaining time")]
-    public Text uiText;
-
-    #if TMP_PRESENT
-    [Tooltip("Optional TextMeshProUGUI to show remaining time")]
+    [Header("UI (drag here)")]
     public TextMeshProUGUI tmpText;
-    #endif
-
+    public Text uiText;
     [Tooltip("Optional Image used as a fill (set Image Type to Filled)")]
     public Image uiFillImage;
 
-    [Tooltip("If true, UI will show time remaining; otherwise it shows progress 0-1")]
+    [Header("Behavior")]
+    [Tooltip("Start the timer automatically when the GameObject is enabled")]
+    public bool startOnEnable = true;
+    [Tooltip("Use unscaled time (ignores Time.timeScale)")]
+    public bool useUnscaledTime = false;
+    [Tooltip("Show numeric time remaining instead of progress 0-1")]
     public bool showTimeRemaining = true;
-
-    [Tooltip("Time format used when showing remaining time (e.g. mm\\:ss or F1)")]
+    [Tooltip("Numeric format when showing remaining time, e.g. F1")]
     public string timeFormat = "F1";
+    [Tooltip("Enable debug logs")]
+    public bool debugLogs = false;
 
     private float timeRemaining;
     private bool isRunning;
+    private bool isPaused;
+
+    public bool IsRunning => isRunning;
+    public bool IsPaused => isPaused;
+    public float TimeRemaining => Mathf.Max(0f, timeRemaining);
+    public float NormalizedRemaining => duration > 0f ? Mathf.Clamp01(timeRemaining / duration) : 0f;
+    public float Progress => 1f - NormalizedRemaining;
 
     void OnEnable()
     {
+        if (duration <= 0f) duration = 1f;
         ResetTimer();
-        StartTimer();
+        if (startOnEnable) StartTimer();
         UpdateUIImmediate();
+        if (debugLogs) Debug.Log($"[MiniTimer] Enabled. startOnEnable={startOnEnable}, duration={duration}");
     }
 
     void OnDisable()
     {
         isRunning = false;
+        isPaused = false;
+        if (debugLogs) Debug.Log("[MiniTimer] Disabled");
     }
 
     void Update()
     {
-        if (!isRunning) return;
+        if (!isRunning || isPaused) return;
 
-        timeRemaining -= Time.deltaTime;
+        float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        timeRemaining -= dt;
+        if (debugLogs) Debug.Log($"[MiniTimer] timeRemaining={timeRemaining:F2} dt={dt:F4}");
 
         if (timeRemaining <= 0f)
         {
             timeRemaining = 0f;
             isRunning = false;
+            if (debugLogs) Debug.Log("[MiniTimer] Finished");
             onTimerFinished?.Invoke();
         }
 
         UpdateUI();
     }
 
+    [ContextMenu("Start Timer")]
     public void StartTimer()
     {
         timeRemaining = duration;
         isRunning = true;
+        isPaused = false;
+        if (debugLogs) Debug.Log("[MiniTimer] StartTimer");
         UpdateUIImmediate();
     }
 
+    [ContextMenu("Reset Timer")]
     public void ResetTimer()
     {
         timeRemaining = duration;
         isRunning = false;
+        isPaused = false;
+        if (debugLogs) Debug.Log("[MiniTimer] ResetTimer");
         UpdateUIImmediate();
+    }
+
+    [ContextMenu("Pause Timer")]
+    public void PauseTimer()
+    {
+        if (!isRunning || isPaused) return;
+        isPaused = true;
+        if (debugLogs) Debug.Log("[MiniTimer] Paused");
+        onTimerPaused?.Invoke();
+    }
+
+    [ContextMenu("Resume Timer")]
+    public void ResumeTimer()
+    {
+        if (!isRunning || !isPaused) return;
+        isPaused = false;
+        if (debugLogs) Debug.Log("[MiniTimer] Resumed");
+        onTimerResumed?.Invoke();
+    }
+
+    [ContextMenu("Toggle Pause")]
+    public void TogglePause()
+    {
+        if (!isRunning) return;
+        if (isPaused) ResumeTimer();
+        else PauseTimer();
+    }
+
+    [ContextMenu("Restart Timer")]
+    public void RestartTimer()
+    {
+        ResetTimer();
+        StartTimer();
     }
 
     private void UpdateUI()
     {
-        float progress = Mathf.Clamp01(1f - (timeRemaining / Mathf.Max(0.0001f, duration)));
+        float normalized = NormalizedRemaining;
+        float progress = Progress;
 
-        // Update fill image if assigned
         if (uiFillImage != null)
-        {
-            uiFillImage.fillAmount = showTimeRemaining ? (timeRemaining / Mathf.Max(0.0001f, duration)) : progress;
-        }
+            uiFillImage.fillAmount = showTimeRemaining ? normalized : progress;
 
-        // Update Unity UI Text
-        if (uiText != null)
-        {
-            uiText.text = showTimeRemaining ? FormatTime(timeRemaining) : progress.ToString("F2");
-        }
+        string display = showTimeRemaining ? FormatTime(TimeRemaining) : progress.ToString("F2");
 
-        // Update TextMeshPro if present and assigned
-        #if TMP_PRESENT
-        if (tmpText != null)
-        {
-            tmpText.text = showTimeRemaining ? FormatTime(timeRemaining) : progress.ToString("F2");
-        }
-        #endif
+        if (tmpText != null) tmpText.text = display;
+        if (uiText != null) uiText.text = display;
     }
 
-    // Force an immediate UI refresh (useful when starting/resetting)
-    private void UpdateUIImmediate()
-    {
-        UpdateUI();
-    }
+    private void UpdateUIImmediate() => UpdateUI();
 
     private string FormatTime(float t)
     {
-        // If user provided a numeric format like "F1" use that, otherwise try mm:ss style
-        if (timeFormat.StartsWith("F"))
+        if (t < 0f) t = 0f;
+        if (!string.IsNullOrEmpty(timeFormat) && timeFormat.StartsWith("F"))
             return t.ToString(timeFormat);
-        else
-        {
-            int minutes = Mathf.FloorToInt(t / 60f);
-            int seconds = Mathf.FloorToInt(t % 60f);
-            return string.Format("{0:00}:{1:00}", minutes, seconds);
-        }
+        int minutes = Mathf.FloorToInt(t / 60f);
+        int seconds = Mathf.FloorToInt(t % 60f);
+        return $"{minutes:00}:{seconds:00}";
     }
 }

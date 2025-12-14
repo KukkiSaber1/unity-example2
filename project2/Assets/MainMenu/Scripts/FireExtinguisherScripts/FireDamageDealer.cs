@@ -11,10 +11,30 @@ public class FireDamageDealer : MonoBehaviour
     public float minDamageRadius = 1f;
     public float maxDamageRadius = 5f;
 
+    [Header("Tick Settings")]
+    [Tooltip("Seconds between damage ticks")]
+    public float tickInterval = 1f; // 1-tick second
+
+    private float tickTimer;
+
+    private void Start()
+    {
+        tickTimer = 0f;
+    }
+
     private void Update()
     {
         if (fireHealth == null || fireHealth.currentHealth <= 0)
             return;
+
+        // accumulate time and apply damage only when a tick elapses
+        tickTimer += Time.deltaTime;
+        if (tickTimer < tickInterval)
+            return;
+
+        // consume ticks (handles cases where frame time > tickInterval)
+        int ticksToProcess = Mathf.FloorToInt(tickTimer / tickInterval);
+        tickTimer -= ticksToProcess * tickInterval;
 
         // Scale radius based on fire health percentage
         float healthPercent = fireHealth.currentHealth / fireHealth.maxHealth;
@@ -27,7 +47,9 @@ public class FireDamageDealer : MonoBehaviour
             PlayerHealth health = player.GetComponent<PlayerHealth>();
             if (health != null)
             {
-                health.TakeDamage(damagePerSecond * Time.deltaTime);
+                // Apply damage for each tick processed
+                float damagePerTick = damagePerSecond * tickInterval;
+                health.TakeDamage(damagePerTick * ticksToProcess);
             }
         }
     }

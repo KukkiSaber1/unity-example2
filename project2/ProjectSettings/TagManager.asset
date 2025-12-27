@@ -15,6 +15,7 @@ TagManager:
   - PickedUp
   - HoldingItem
   - Smoke
+  - Water
   layers:
   - Default
   - TransparentFX

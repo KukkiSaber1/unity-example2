@@ -7,98 +7,54 @@ using UnityEngine.UI;
 public class ScoreboardUI : MonoBehaviour
 {
     [Header("Prefabs and container")]
-    public GameObject groupPrefab;      // ScoreGroup prefab (see instructions)
-    public GameObject rowPrefab;        // ScoreRow prefab (single row)
-    public RectTransform contentParent; // ScrollView Content
+    public GameObject rowPrefab;        
+    public RectTransform contentParent; 
 
     [Header("Formats")]
-    public string headerFormat = "{0} ({1})";
-    public string rowFormat = "{0}. {1} - {2} pts - {3}";
+    public string rowFormat = "{0}. {1} - {2} PTS - {3}";
 
     [Header("Optional visuals")]
-    public Color evenColor = new Color(0,0,0,0);
-    public Color oddColor  = new Color(0,0,0,0);
+    public Color evenColor = new Color(0.2f, 0.2f, 0.2f, 0.5f); // Semi-transparent grey
+    public Color oddColor = new Color(0, 0, 0, 0);             // Transparent
 
     private void OnEnable() => Refresh();
 
     public void Refresh()
     {
-        if (groupPrefab == null || rowPrefab == null || contentParent == null)
-        {
-            Debug.LogWarning("[ScoreboardUI] Assign groupPrefab, rowPrefab and contentParent.");
-            return;
+        if (rowPrefab == null || contentParent == null) return;
+
+        // 1. Clear existing children
+        foreach (Transform child in contentParent) {
+            Destroy(child.gameObject);
         }
 
-        // Clear existing children
-        for (int i = contentParent.childCount - 1; i >= 0; i--)
-            Destroy(contentParent.GetChild(i).gameObject);
-
-        // Load and group scores
-        List<ScoreEntry> all = PersistentScores.Load();
-        var groups = all
-            .GroupBy(e => e.sceneName)
-            .OrderBy(g => g.Key)
-            .Select(g => new { SceneName = g.Key, Entries = g.OrderByDescending(e => e.score).ToList() })
+        // 2. Load and Sort
+        List<ScoreEntry> allScores = PersistentScores.Load()
+            .OrderByDescending(e => e.score)
             .ToList();
 
-        // If no scores, show a single header
-        if (groups.Count == 0)
+        // 3. Create Rows
+        for (int i = 0; i < allScores.Count; i++)
         {
-            GameObject emptyGroup = Instantiate(groupPrefab, contentParent);
-            emptyGroup.transform.localScale = Vector3.one;
-            var headerTmp = emptyGroup.GetComponentInChildren<TextMeshProUGUI>();
-            if (headerTmp != null) headerTmp.text = "No scores yet";
-            Canvas.ForceUpdateCanvases();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(contentParent);
-            return;
+            var entry = allScores[i];
+            GameObject row = Instantiate(rowPrefab, contentParent);
+            
+            // Ensure scale is correct and it's active
+            row.transform.localScale = Vector3.one;
+
+            // Set Text
+            var tmp = row.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null)
+                tmp.text = string.Format(rowFormat, i + 1, entry.sceneName, entry.score, entry.timestamp);
+
+            // Set Background Color
+            var img = row.GetComponent<Image>();
+            if (img != null)
+                img.color = (i % 2 == 0) ? evenColor : oddColor;
         }
 
-        // Create a group for each scene
-        foreach (var g in groups)
-        {
-            GameObject groupObj = Instantiate(groupPrefab, contentParent);
-            groupObj.transform.localScale = Vector3.one;
-
-            // Header text (first TextMeshProUGUI found is used)
-            var headerTmp = groupObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (headerTmp != null)
-                headerTmp.text = string.Format(headerFormat, g.SceneName, g.Entries.Count);
-
-            // Find the GroupContent transform inside the group prefab
-            // Expectation: groupPrefab has a child named "GroupContent" (or any child tagged)
-            Transform groupContent = groupObj.transform.Find("GroupContent");
-            if (groupContent == null)
-            {
-                // fallback: use groupObj as parent for rows (works if root VerticalLayoutGroup stacks header + rows)
-                groupContent = groupObj.transform;
-            }
-
-            // Instantiate rows inside this group's content
-            for (int i = 0; i < g.Entries.Count; i++)
-            {
-                var entry = g.Entries[i];
-                GameObject row = Instantiate(rowPrefab, groupContent);
-                row.transform.localScale = Vector3.one;
-
-                var tmp = row.GetComponentInChildren<TextMeshProUGUI>();
-                if (tmp != null)
-                {
-                    tmp.text = string.Format(rowFormat, i + 1, entry.sceneName, entry.score, entry.timestamp);
-                }
-
-                var img = row.GetComponent<Image>();
-                if (img != null)
-                {
-                    bool useColors = (evenColor.a > 0f || oddColor.a > 0f) || (evenColor != Color.clear || oddColor != Color.clear);
-                    if (useColors) img.color = (i % 2 == 0) ? evenColor : oddColor;
-                }
-            }
-        }
-
-        // Force layout rebuild so everything sizes and positions correctly
-        Canvas.ForceUpdateCanvases();
+        // 4. THE FIX FOR OVERLAPPING: Force Unity to recalculate the layout immediately
         LayoutRebuilder.ForceRebuildLayoutImmediate(contentParent);
-        Canvas.ForceUpdateCanvases();
     }
 
     public void ClearScores()

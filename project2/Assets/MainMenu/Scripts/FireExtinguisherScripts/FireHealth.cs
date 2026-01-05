@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,7 +16,6 @@ public class FireHealth : MonoBehaviour
     public ParticleSystem fireParticle;
 
     [Header("Events")]
-    // This event is invoked only when health decreases and cooldown has elapsed.
     public UnityEvent<float> onHealthChanged;    // passes new health when decreased (subject to cooldown)
     public UnityEvent onFireExtinguished;        // health == 0
     public UnityEvent onFireMaxed;               // health == max
@@ -25,9 +25,21 @@ public class FireHealth : MonoBehaviour
     [Tooltip("Minimum seconds between consecutive onHealthChanged invocations when health decreases.")]
     public float healthChangeCooldown = 3f;
 
+    [Header("Damage From Objects / Particles")]
+    [Tooltip("Tag of objects that should damage the fire when they hit or enter the fire collider.")]
+    public string damagingTag = "Water";
+    [Tooltip("Amount of health to subtract when a damaging object/particle hits the fire.")]
+    public float damageAmount = 20f;
+    [Tooltip("Minimum seconds between particle damage applications to avoid spam.")]
+    public float damageCooldown = 0.5f;
+
     private ParticleSystem.MainModule mainModule;
     private bool wasAboveHalf = true;            // track last state
     private float lastHealthDecreaseEventTime = -Mathf.Infinity;
+
+    // For preventing repeated damage from the same object while it stays inside
+    private HashSet<int> objectsInside = new HashSet<int>();
+    private float lastParticleDamageTime = -Mathf.Infinity;
 
     void Awake()
     {
@@ -112,5 +124,85 @@ public class FireHealth : MonoBehaviour
         maxHealth = Mathf.Max(0.0001f, maxHealth);
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         healthChangeCooldown = Mathf.Max(0f, healthChangeCooldown);
+        damageAmount = Mathf.Max(0f, damageAmount);
+        damageCooldown = Mathf.Max(0f, damageCooldown);
+    }
+
+    // -------------------------
+    // Collision / Trigger logic
+    // -------------------------
+
+    // If your fire collider is a trigger, this will catch objects entering it.
+    void OnTriggerEnter(Collider other)
+    {
+        if (other == null) return;
+
+        if (!string.IsNullOrEmpty(damagingTag) && other.CompareTag(damagingTag))
+        {
+            int id = other.GetInstanceID();
+            if (!objectsInside.Contains(id))
+            {
+                objectsInside.Add(id);
+                ModifyHealth(-damageAmount);
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other == null) return;
+
+        if (!string.IsNullOrEmpty(damagingTag) && other.CompareTag(damagingTag))
+        {
+            int id = other.GetInstanceID();
+            if (objectsInside.Contains(id))
+                objectsInside.Remove(id);
+        }
+    }
+
+    // If your fire collider is NOT a trigger and you want to use physics collisions:
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision == null || collision.gameObject == null) return;
+
+        if (!string.IsNullOrEmpty(damagingTag) && collision.gameObject.CompareTag(damagingTag))
+        {
+            int id = collision.gameObject.GetInstanceID();
+            if (!objectsInside.Contains(id))
+            {
+                objectsInside.Add(id);
+                ModifyHealth(-damageAmount);
+            }
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision == null || collision.gameObject == null) return;
+
+        if (!string.IsNullOrEmpty(damagingTag) && collision.gameObject.CompareTag(damagingTag))
+        {
+            int id = collision.gameObject.GetInstanceID();
+            if (objectsInside.Contains(id))
+                objectsInside.Remove(id);
+        }
+    }
+
+    // Particle collisions: requires the particle system's Collision module to be enabled
+    // and "Send Collision Messages" checked so Unity calls OnParticleCollision.
+    void OnParticleCollision(GameObject other)
+    {
+        // 'other' is the GameObject that owns the particle system that hit this object.
+        // We check its tag (or you can check other properties).
+        if (other == null) return;
+
+        if (!string.IsNullOrEmpty(damagingTag) && other.CompareTag(damagingTag))
+        {
+            if (Time.time - lastParticleDamageTime >= damageCooldown)
+            {
+                ModifyHealth(-damageAmount);
+                lastParticleDamageTime = Time.time;
+            }
+        }
     }
 }

@@ -9,13 +9,13 @@ TagManager:
   - canPickUp
   - Pickup
   - UI
-  - Extinguisher
   - Fire
   - Equipable
   - PickedUp
   - HoldingItem
   - Smoke
   - Water
+  - Extinguisher
   layers:
   - Default
   - TransparentFX
